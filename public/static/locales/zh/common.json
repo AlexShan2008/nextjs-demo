@@ -1,0 +1,7 @@
+{
+  "h1": "一个简单的 DEMO",
+  "change-locale": "更换语言",
+  "to-second-page": "去 demo 页面",
+  "error-with-status": "A {{statusCode}} error occurred on server",
+  "error-without-status": "An error occurred on the server"
+}

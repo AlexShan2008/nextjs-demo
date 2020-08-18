@@ -5,11 +5,39 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "export": "next build && next export",
+    "type-check": "tsc --pretty --noEmit",
+    "format": "prettier --write \"**/*.{js,ts,tsx}\"",
+    "lint": "eslint . --ext ts --ext tsx --ext js"
   },
   "dependencies": {
+    "antd": "^4.5.4",
     "next": "9.5.2",
+    "next-i18next": "^6.0.2",
     "react": "16.13.1",
     "react-dom": "16.13.1"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^3.9.1",
+    "eslint": "^7.7.0",
+    "eslint-config-airbnb-typescript": "^9.0.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-import": "^2.22.0",
+    "eslint-plugin-jsx-a11y": "^6.3.1",
+    "eslint-plugin-react": "^7.20.6",
+    "eslint-plugin-react-hooks": "^4.1.0",
+    "lint-staged": "^10.2.11",
+    "prettier": "^2.0.5"
+  },
+  "gitHooks": {
+    "pre-commit": "lint-staged",
+    "pre-push": "yarn run type-check"
+  },
+  "lint-staged": {
+    "*.@(ts|tsx)": [
+      "yarn lint",
+      "yarn format"
+    ]
   }
 }
