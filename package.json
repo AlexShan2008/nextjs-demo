@@ -27,15 +27,19 @@
     "eslint-plugin-jsx-a11y": "^6.3.1",
     "eslint-plugin-react": "^7.20.6",
     "eslint-plugin-react-hooks": "^4.1.0",
+    "husky": "^4.2.5",
     "lint-staged": "^10.2.11",
-    "prettier": "^2.0.5"
+    "prettier": "^2.0.5",
+    "typescript": "^3.9.7"
   },
-  "gitHooks": {
-    "pre-commit": "lint-staged",
-    "pre-push": "yarn run type-check"
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged",
+      "pre-push": "yarn run type-check"
+    }
   },
   "lint-staged": {
-    "*.@(ts|tsx)": [
+    "*.@(ts|tsx|js)": [
       "yarn lint",
       "yarn format"
     ]
