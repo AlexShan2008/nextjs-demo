@@ -1,35 +1,47 @@
+// import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types';
 import Head from 'next/head';
+import Link from 'next/link';
+// import { useRouter } from 'next/router'
+import { Layout, Menu } from 'antd';
 
-const Header = ({ title }) => (
-  <>
-    <Head>
-      <title>next-i18next</title>
+const { Content } = Layout;
+import { NAV_LIST } from './data';
 
-      <link
-        href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css"
-        rel="stylesheet"
-      />
-      <link href="/static/app.css" rel="stylesheet" />
+function Header({ title }) {
+  // const [active, setActive] = useState('1')
+  // const router = useRouter()
 
-      <link
-        href="https://cdnjs.cloudflare.com/ajax/libs/typicons/2.0.9/typicons.min.css"
-        rel="stylesheet"
-      />
-      <link
-        href="https://fonts.googleapis.com/css?family=Open+Sans:300,400|Oswald:600"
-        rel="stylesheet"
-      />
-      <link
-        data-react-helmet="true"
-        rel="icon"
-        href="https://blobscdn.gitbook.com/v0/b/gitbook-28427.appspot.com/o/spaces%2F-L9iS6Wm2hynS5H9Gj7j%2Favatar.png?generation=1523462254548780&amp;alt=media"
-      />
-    </Head>
+  // useEffect(() => {
+  //   if (router.pathname.includes('demo')) {
+  //     setActive('2')
+  //   } else {
+  //     setActive('1')
+  //   }
+  // })
 
-    <h1>{title}</h1>
-  </>
-);
+  return (
+    <>
+      <Head>
+        <title>next-i18next</title>
+      </Head>
+
+      <Menu theme="dark" mode="horizontal" defaultSelectedKeys={['1']}>
+        {NAV_LIST.map((nav) => (
+          <Menu.Item key={nav.id}>
+            <Link href={nav.href}>
+              <a>{nav.name}</a>
+            </Link>
+          </Menu.Item>
+        ))}
+      </Menu>
+
+      <Content style={{ padding: '0 50px' }}>
+        <h1>{title}</h1>
+      </Content>
+    </>
+  );
+}
 
 Header.propTypes = {
   title: PropTypes.string.isRequired,

@@ -15,21 +15,21 @@ function Home({ t }) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className={styles.main}>
-        <Header title={t('h1')} />
+      <Header title={t('h1')} />
 
+      <main className={styles.main}>
         <section>
-          <button
-            type="button"
+          <Button
+            type="primary"
             onClick={() => i18n.changeLanguage(i18n.language === 'en' ? 'zh' : 'en')}
           >
             {t('change-locale')}
-          </button>
+          </Button>
         </section>
 
         <div className={styles.grid}>
           <Link href="/demo">
-            <Button>{t('to-second-page')}</Button>
+            <Button type="link">{t('to-second-page')}</Button>
           </Link>
         </div>
       </main>

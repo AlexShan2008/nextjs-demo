@@ -17,14 +17,14 @@ function Demo({ t }) {
       <main className={styles.root}>
         <Link href="/">
           <a>
-            <Button>{t('back-to-home')}</Button>
+            <Button type="link">{t('back-to-home')}</Button>
           </a>
         </Link>
 
         <div className={styles.content}>
           <p>You clicked {count} times</p>
 
-          <button onClick={() => setCount(count + 1)}>Click me</button>
+          <Button onClick={() => setCount(count + 1)}>Click me</Button>
         </div>
       </main>
     </div>
