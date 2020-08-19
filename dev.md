@@ -57,3 +57,9 @@ npm i pre-commit
 ```sh
 npm i sass
 ```
+
+## postcss.config
+
+```sh
+npm i postcss-flexbugs-fixes postcss-preset-env  -D
+```
