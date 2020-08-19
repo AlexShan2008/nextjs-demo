@@ -2,19 +2,19 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import Head from 'next/head';
 import { Button } from 'antd';
-import styles from '../../styles/Demo.module.css';
+import styles from '../../styles/Demo.module.scss';
 import { withTranslation, Link } from '../../i18n';
 
 function Demo({ t }) {
   const [count, setCount] = useState(0);
 
   return (
-    <div>
+    <div className={styles.root}>
       <Head>
         <title>Next.js Demo</title>
       </Head>
 
-      <main className={styles.root}>
+      <main>
         <Link href="/">
           <a>
             <Button type="link">{t('back-to-home')}</Button>
@@ -27,6 +27,8 @@ function Demo({ t }) {
           <Button onClick={() => setCount(count + 1)}>Click me</Button>
         </div>
       </main>
+
+      <img className={styles.img} src="/static/cartoon.jpeg" alt="my image" />
     </div>
   );
 }

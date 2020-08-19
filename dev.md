@@ -51,3 +51,9 @@ npm install eslint-config-airbnb-typescript \
 ```sh
 npm i pre-commit
 ```
+
+## sass
+
+```sh
+npm i sass
+```
