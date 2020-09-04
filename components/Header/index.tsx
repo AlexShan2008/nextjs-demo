@@ -8,7 +8,11 @@ import { Layout, Menu } from 'antd';
 const { Content } = Layout;
 import { NAV_LIST } from './data';
 
-function Header({ title }) {
+type Props = {
+  title?: string;
+};
+
+function Header({ title }: Props): JSX.Element {
   // const [active, setActive] = useState('1')
   // const router = useRouter()
 

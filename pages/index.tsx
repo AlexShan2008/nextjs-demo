@@ -1,13 +1,13 @@
 import PropTypes from 'prop-types';
 import Head from 'next/head';
-import styles from '../styles/Home.module.css';
-import { i18n, Link, withTranslation } from '../i18n';
-import Header from '../components/Header';
-import Footer from '../components/Footer';
+import styles from '@/styles/Home.module.css';
+import { i18n, Link, withTranslation } from 'i18n';
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
 
 import { Button } from 'antd';
 
-function Home({ t }) {
+function Home({ t }): JSX.Element {
   return (
     <div className={styles.container}>
       <Head>

@@ -4,9 +4,9 @@ import Head from 'next/head';
 import useSwr from 'swr';
 // import Link from 'next/link'
 import { Button } from 'antd';
-import styles from '../../styles/Demo.module.scss';
-import { withTranslation, Link } from '../../i18n';
-import { fetcher } from '../../utils';
+import styles from '@/styles/Demo.module.scss';
+import { withTranslation, Link } from 'i18n';
+import { fetcher } from 'utils';
 
 function Demo({ t }) {
   const [count, setCount] = useState(0);

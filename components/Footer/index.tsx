@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
-import { withTranslation } from '../../i18n';
-import styles from '../../styles/Home.module.css';
+import { withTranslation } from 'i18n';
+import styles from '@/styles/Home.module.css';
 
 const Footer = ({ t }) => (
   <footer className={styles.footer}>
