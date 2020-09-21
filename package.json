@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "antd": "^4.5.4",
+    "cookie": "^0.4.1",
     "next": "9.5.2",
     "next-i18next": "^6.0.2",
     "react": "16.13.1",
