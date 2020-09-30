@@ -1,8 +1,10 @@
 import * as THREE from 'three';
 
-// import handleInteractive from './handlers';
+import { isMobile } from '../../utils/browser.js';
 
 let scene, camera, renderer;
+
+let interactiveFlag = false;
 
 // solve the serve render does not has the window Object
 if (typeof window === 'undefined') {
@@ -20,7 +22,7 @@ let lon = 90, // 把鼠标在屏幕上的横偏移量 作为 作为旋转角度�
 
 let startX, startY, startLon, startLat;
 
-function init() {
+const init = () => {
   // 初始化
   const app = document.getElementById('vrApp');
 
@@ -44,18 +46,26 @@ function init() {
 
   createMesh();
 
-  // handleInteractive(renderer, camera)
-
-  app.addEventListener('touchstart', handleTouchStart, false);
-  app.addEventListener('touchmove', handleTouchMove, false);
-}
+  if (isMobile) {
+    // handle finger touch
+    app.addEventListener('touchstart', handleTouchStart);
+    app.addEventListener('touchmove', handleTouchMove);
+    app.addEventListener('touchend', handleTouchEnd);
+  } else {
+    // PC handle mouse click
+    app.addEventListener('mousedown', handleMouseDown);
+    app.addEventListener('mousemove', handleMouseMove);
+    app.addEventListener('mouseup', handleMouseEnd);
+    app.addEventListener('mouseout', handleMouseEnd);
+  }
+};
 
 // 创建 几何体、材质、模型、立方体纹理
-function createMesh() {
+const createMesh = () => {
   const baseUrl = '/static/images/vr/';
 
   const textureLoader = new THREE.CubeTextureLoader().setPath(baseUrl); // 立方纹理
-  const arr = ['f.jpg', 'b.jpg', 'u.jpg', 'd.jpg', 'l.jpg', 'r.jpg']; // 6张纹理图依次贴在立方体的x正、x负、y负、y正、z负、z正6个面 前后 上下 左右的 顺序放置的
+  const arr = ['f.jpg', 'b.jpg', 'u.jpg', 'd.jpg', 'l.jpg', 'r.jpg']; // 6张纹理图依次贴在立方体的x正(前)、x负（后）、y负（上）、y正（下）、z负（左）、z正（右） 的 顺序放置的
   const texture = textureLoader.load(arr);
   const geometry = new THREE.BoxGeometry(50, 50, 50); // 几何体
   const material = new THREE.MeshPhongMaterial({
@@ -70,7 +80,7 @@ function createMesh() {
   //环境光
   const ambient = new THREE.AmbientLight(0xffffff);
   scene.add(ambient);
-}
+};
 
 // just for test the camera position
 // function test() {
@@ -79,39 +89,81 @@ function createMesh() {
 //     renderer.render(scene, camera);
 // }
 
-function update() {
-  lon += 0.05;
+const update = () => {
+  if (!interactiveFlag) {
+    lon += 0.05;
+  }
+
   lat = Math.max(-85, Math.min(85, lat));
   phi = THREE.Math.degToRad(90 - lat);
   theta = THREE.Math.degToRad(lon);
+
   target.x = 500 * Math.sin(phi) * Math.cos(theta);
   target.y = 500 * Math.cos(phi);
   target.z = 500 * Math.sin(phi) * Math.sin(theta);
+
   camera.lookAt(target);
   renderer.render(scene, camera);
-}
+};
 
-function animate() {
+const animate = () => {
   renderer.render(scene, camera);
   requestAnimationFrame(animate);
-  // update();
-}
+  update();
+};
 
-function handleTouchStart(e) {
+const handleTouchStart = (e) => {
   e.preventDefault();
+
+  interactiveFlag = true;
 
   startX = e.touches[0].pageX;
   startY = e.touches[0].pageY;
   startLon = lon;
   startLat = lat;
-}
+};
 
-function handleTouchMove(e) {
+const handleTouchMove = (e) => {
   e.preventDefault();
   lon = (startX - e.touches[0].pageX) * 0.2 + startLon;
   lat = (e.touches[0].pageY - startY) * 0.2 + startLat;
   update();
-}
+};
+
+const handleTouchEnd = (e) => {
+  e.preventDefault();
+
+  interactiveFlag = false;
+};
+
+const handleMouseDown = (e) => {
+  interactiveFlag = true;
+
+  e.preventDefault();
+  e = e || window.event;
+
+  startX = e.clientX;
+  startY = e.clientY;
+  startLon = lon;
+  startLat = lat;
+};
+
+const handleMouseMove = (e) => {
+  if (!interactiveFlag) return;
+
+  e.preventDefault();
+  e = e || window.event;
+
+  // 触点水平和垂直坐标
+  lon = (startX - e.clientX) * 0.2 + startLon;
+  lat = (e.clientY - startY) * 0.2 + startLat;
+  update();
+};
+
+const handleMouseEnd = (e) => {
+  e.preventDefault();
+  interactiveFlag = false;
+};
 
 const start = () => {
   init();
