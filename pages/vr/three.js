@@ -1,80 +1,86 @@
 import * as THREE from 'three';
 
-var scene, camera, renderer, mesh;
+// import handleInteractive from './handlers';
+
+let scene, camera, renderer;
 
 // solve the serve render does not has the window Object
 if (typeof window === 'undefined') {
   global.window = {};
 }
 
-var w = window.innerWidth,
+const w = window.innerWidth,
   h = window.innerHeight;
 
-var lon = 90, // 把鼠标在屏幕上的横偏移量 作为 作为旋转角度的基准
+let lon = 90, // 把鼠标在屏幕上的横偏移量 作为 作为旋转角度的基准
   lat = 0, // 把鼠标在屏幕上的纵偏移量 作为 作为旋转角度的基准
   phi = 0, // 相机的横屏面 到 y轴的弧度
   theta = 0, // x相机的竖切面 到 x州的偏移弧度
   target = new THREE.Vector3(); // 相机 看向的 那个方向
 
-// var startX, startY, startLon, startLat;
+let startX, startY, startLon, startLat;
 
 function init() {
   // 初始化
-  var app = document.getElementById('vrApp');
+  const app = document.getElementById('vrApp');
 
-  scene = new THREE.Scene(); // 创造场景
-  camera = new THREE.PerspectiveCamera(70, w / h, 1, 1000); // 创造相机
-  renderer = new THREE.WebGLRenderer({ antialias: true }); // 创造渲染器
+  // 创造场景
+  scene = new THREE.Scene();
 
+  // 创造相机
+  camera = new THREE.PerspectiveCamera(75, w / h, 0.1, 1000);
+  camera.position.set(0, -0, 0); // 设置相机位置
+  camera.lookPoint = {}; // 观察点
+  camera.lookPoint.x = 0;
+  camera.lookPoint.y = 0;
+  camera.lookPoint.z = -1;
+  camera.lookAt(camera.lookPoint.x, camera.lookPoint.y, camera.lookPoint.z);
+
+  // 创造渲染器
+  renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setSize(w, h);
-  // renderer.setPixelRatio(window.devicePixelRatio);
+  renderer.setPixelRatio(window.devicePixelRatio);
   app.appendChild(renderer.domElement);
 
   createMesh();
 
-  // app.addEventListener('touchstart', handleStart, false)
-  // app.addEventListener('touchmove', move, false)
+  // handleInteractive(renderer, camera)
+
+  app.addEventListener('touchstart', handleTouchStart, false);
+  app.addEventListener('touchmove', handleTouchMove, false);
 }
 
+// 创建 几何体、材质、模型、立方体纹理
 function createMesh() {
-  // ary的顺序是按照 前后 上下 左右的 顺序放置的
-  let baseUrl = '/static/images/';
-  let materials = [
-    // 由每一张图片做成的 材料
-    loadTexture(baseUrl + 'f.jpg'),
-    loadTexture(baseUrl + 'b.jpg'),
-    loadTexture(baseUrl + 'u.jpg'),
-    loadTexture(baseUrl + 'd.jpg'),
-    loadTexture(baseUrl + 'l.jpg'),
-    loadTexture(baseUrl + 'r.jpg'),
-  ];
-  let geometry = new THREE.BoxGeometry(300, 300, 300);
-  mesh = new THREE.Mesh(geometry, materials);
-  mesh.scale.x = -1; // 让盒子里外翻一下
-  scene.add(mesh);
-}
+  const baseUrl = '/static/images/vr/';
 
-function loadTexture(url) {
-  //负责把图片做成相应的 材料  ;;  url 对应的是图片的地址
-  var textureLoader = new THREE.TextureLoader();
-  var texture = textureLoader.load(url); // 就是由图片组成一个纹理
-
-  texture.needsUpdate = true; // 纹理已更新旧使用新的纹理
-
-  var basicMaterial = new THREE.MeshBasicMaterial({
-    map: texture,
+  const textureLoader = new THREE.CubeTextureLoader().setPath(baseUrl); // 立方纹理
+  const arr = ['f.jpg', 'b.jpg', 'u.jpg', 'd.jpg', 'l.jpg', 'r.jpg']; // 6张纹理图依次贴在立方体的x正、x负、y负、y正、z负、z正6个面 前后 上下 左右的 顺序放置的
+  const texture = textureLoader.load(arr);
+  const geometry = new THREE.BoxGeometry(50, 50, 50); // 几何体
+  const material = new THREE.MeshPhongMaterial({
+    envMap: texture,
+    side: THREE.DoubleSide,
   });
-  return basicMaterial; // 这个就是有图片所造就的一个面的材料
+
+  const cube = new THREE.Mesh(geometry, material); // 创建mesh
+  cube.position.set(-0, -0, -0);
+  scene.add(cube); // 加入场景
+
+  //环境光
+  const ambient = new THREE.AmbientLight(0xffffff);
+  scene.add(ambient);
 }
 
-function test() {
-  camera.position.set(500, 300, 100);
-  camera.lookAt(scene.position); // 相机 照 向 那个方向
-  renderer.render(scene, camera);
-}
+// just for test the camera position
+// function test() {
+//     camera.position.set(500, 300, 100);
+//     camera.lookAt(scene.position); // 相机 照 向 那个方向
+//     renderer.render(scene, camera);
+// }
 
 function update() {
-  lon += 0.1;
+  lon += 0.05;
   lat = Math.max(-85, Math.min(85, lat));
   phi = THREE.Math.degToRad(90 - lat);
   theta = THREE.Math.degToRad(lon);
@@ -86,30 +92,30 @@ function update() {
 }
 
 function animate() {
+  renderer.render(scene, camera);
   requestAnimationFrame(animate);
-  update();
+  // update();
 }
 
-// function handleStart(e) {
-//     e.preventDefault();
+function handleTouchStart(e) {
+  e.preventDefault();
 
-//     startX = e.touches[0].pageX;
-//     startY = e.touches[0].pageY;
-//     startLon = lon;
-//     startLat = lat;
-// }
+  startX = e.touches[0].pageX;
+  startY = e.touches[0].pageY;
+  startLon = lon;
+  startLat = lat;
+}
 
-// function move(e) {
-//     e.preventDefault();
-//     lon = (startX - e.touches[0].pageX) * 0.2 + startLon
-//     lat = (e.touches[0].pageY - startY) * 0.2 + startLat;
-//     update()
-// }
+function handleTouchMove(e) {
+  e.preventDefault();
+  lon = (startX - e.touches[0].pageX) * 0.2 + startLon;
+  lat = (e.touches[0].pageY - startY) * 0.2 + startLat;
+  update();
+}
 
 const start = () => {
   init();
   animate();
-
-  test();
 };
+
 export default start;
