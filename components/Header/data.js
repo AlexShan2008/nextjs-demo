@@ -14,4 +14,9 @@ export const NAV_LIST = [
     name: 'VR',
     href: '/vr',
   },
+  {
+    id: 4,
+    name: 'Recoil',
+    href: '/recoil',
+  },
 ];

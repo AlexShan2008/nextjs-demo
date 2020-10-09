@@ -39,11 +39,12 @@ const init = () => {
   camera.lookAt(camera.lookPoint.x, camera.lookPoint.y, camera.lookPoint.z);
 
   // 创造渲染器
-  renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer = new THREE.WebGLRenderer({ antialias: true }); // 反走样，防止照片周边放大出现锯齿状
   renderer.setSize(w, h);
   renderer.setPixelRatio(window.devicePixelRatio);
   app.appendChild(renderer.domElement);
 
+  // 创建立方体
   createMesh();
 
   if (isMobile) {
@@ -89,6 +90,7 @@ const createMesh = () => {
 //     renderer.render(scene, camera);
 // }
 
+// 更新相机位置及朝向
 const update = () => {
   if (!interactiveFlag) {
     lon += 0.05;
@@ -103,6 +105,7 @@ const update = () => {
   target.z = 500 * Math.sin(phi) * Math.sin(theta);
 
   camera.lookAt(target);
+
   renderer.render(scene, camera);
 };
 

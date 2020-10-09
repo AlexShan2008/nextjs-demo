@@ -9,14 +9,17 @@ import 'moment/locale/zh-cn';
 import 'antd/dist/antd.css';
 import '../styles/globals.css';
 import { appWithTranslation } from '../i18n';
+import { RecoilRoot } from 'recoil';
 
 moment.locale('zh-cn');
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
-    <ConfigProvider locale={zhCN}>
-      <Component {...pageProps} />
-    </ConfigProvider>
+    <RecoilRoot>
+      <ConfigProvider locale={zhCN}>
+        <Component {...pageProps} />
+      </ConfigProvider>
+    </RecoilRoot>
   );
 }
 
