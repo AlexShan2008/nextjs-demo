@@ -11,7 +11,13 @@ import '../styles/globals.css';
 import { appWithTranslation } from '../i18n';
 import { RecoilRoot } from 'recoil';
 
+import '@/styles/scss/material-kit-react.scss?v=1.9.0';
+
 moment.locale('zh-cn');
+
+if (typeof window === 'undefined') {
+  global.window = {};
+}
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (

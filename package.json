@@ -12,6 +12,8 @@
     "lint": "eslint . --ext ts --ext tsx --ext js"
   },
   "dependencies": {
+    "@material-ui/core": "^4.11.0",
+    "@material-ui/icons": "^4.9.1",
     "antd": "^4.5.4",
     "bowser": "^2.11.0",
     "cookie": "^0.4.1",
@@ -19,6 +21,7 @@
     "next-i18next": "^6.0.2",
     "react": "16.13.1",
     "react-dom": "16.13.1",
+    "react-router-dom": "^5.2.0",
     "recoil": "0.0.13",
     "sass": "^1.26.10",
     "swr": "^0.3.0",

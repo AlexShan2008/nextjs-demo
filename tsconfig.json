@@ -24,6 +24,9 @@
       ],
       "@/styles/*": [
         "styles/*"
+      ],
+      "@/static/*": [
+        "public/static/*"
       ]
     }
   },
