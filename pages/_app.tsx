@@ -16,7 +16,7 @@ import '@/styles/scss/material-kit-react.scss?v=1.9.0';
 moment.locale('zh-cn');
 
 if (typeof window === 'undefined') {
-  global.window = {};
+  (global as any).window = {};
 }
 
 function MyApp({ Component, pageProps }: AppProps) {

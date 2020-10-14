@@ -28,7 +28,7 @@ function Home(props): JSX.Element {
   return (
     <div className={styles.container}>
       <Head>
-        <title>Create Next App</title>
+        <title>Welcome to Hello Next.js</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
