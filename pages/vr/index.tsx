@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import Head from 'next/head';
-import start from './vr';
+import start from '../../utils/vr';
 
 import styles from '@/styles/VR.module.scss';
 

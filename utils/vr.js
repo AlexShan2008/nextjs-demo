@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 
-import { isMobile } from '../../utils/browser.js';
+import { isMobile } from './browser.js';
 
 let scene, camera, renderer;
 
@@ -8,7 +8,14 @@ let interactiveFlag = false;
 
 // solve the serve render does not has the window Object
 if (typeof window === 'undefined') {
-  global.window = {};
+  global.window = {
+    navigator: {
+      userAgent: '',
+    },
+    location: {
+      href: '',
+    },
+  };
 }
 
 const w = window.innerWidth,
@@ -23,6 +30,10 @@ let lon = 90, // 把鼠标在屏幕上的横偏移量 作为 作为旋转角度�
 let startX, startY, startLon, startLat;
 
 const init = () => {
+  if (typeof document == 'undefined') {
+    return;
+  }
+
   // 初始化
   const app = document.getElementById('vrApp');
 
