@@ -1,22 +1,31 @@
 // nodejs library to set properties for components
 import PropTypes from 'prop-types';
+import React from 'react';
 // @mui/material components
 import { styled } from '@mui/material/styles';
 import Grid from '@mui/material/Grid';
 
-const StyledGrid = styled(Grid)(({ theme }) => ({
-  position: 'relative',
-  width: '100%',
-  minHeight: '1px',
-  paddingRight: '15px',
-  paddingLeft: '15px',
-  flexBasis: 'auto',
+const PREFIX = 'GridItem';
+
+const classes = {
+  grid: `${PREFIX}-grid`,
+};
+
+const StyledGrid = styled(Grid)(({ _theme }) => ({
+  [`&.${classes.grid}`]: {
+    position: 'relative',
+    width: '100%',
+    minHeight: '1px',
+    paddingRight: '15px',
+    paddingLeft: '15px',
+    flexBasis: 'auto',
+  },
 }));
 
 export default function GridItem(props) {
-  const { children, ...rest } = props;
+  const { children, className, ...rest } = props;
   return (
-    <StyledGrid item {...rest}>
+    <StyledGrid item className={`${classes.grid} ${className || ''}`} {...rest}>
       {children}
     </StyledGrid>
   );
