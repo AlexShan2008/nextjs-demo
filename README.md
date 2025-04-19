@@ -1,4 +1,4 @@
-# React Three.js VR Tour
+# Next.js Demo
 
 ## [Demo](https://nextjs-demo-bice.vercel.app/)
 
