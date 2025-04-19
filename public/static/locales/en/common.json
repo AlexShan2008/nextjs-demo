@@ -1,7 +1,8 @@
 {
-  "h1": "A simple example",
-  "change-locale": "Change locale",
-  "to-second-page": "To second page",
+  "welcome": "Welcome to Next.js",
+  "change-locale": "Change Language",
+  "to-second-page": "To Demo Page",
+  "back-to-home": "Back to Home",
   "error-with-status": "A {{statusCode}} error occurred on server",
   "error-without-status": "An error occurred on the server"
 }

@@ -1,17 +1,18 @@
-import React from 'react';
 // nodejs library to set properties for components
 import PropTypes from 'prop-types';
-// @material-ui/core components
-import { makeStyles } from '@material-ui/core/styles';
-// core components
+// @mui/material components
+import { styled } from '@mui/material/styles';
+
 import styles from '@/styles/jss/material-kit-react/components/typographyStyle.js';
 
-const useStyles = makeStyles(styles);
+const StyledDiv = styled('div')(({ _theme }) => ({
+  ...styles.defaultFontStyle,
+  ...styles.primaryText,
+}));
 
 export default function Primary(props) {
-  const classes = useStyles();
   const { children } = props;
-  return <div className={classes.defaultFontStyle + ' ' + classes.primaryText}>{children}</div>;
+  return <StyledDiv>{children}</StyledDiv>;
 }
 
 Primary.propTypes = {

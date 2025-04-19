@@ -1,41 +1,54 @@
-import PropTypes from 'prop-types';
+import React from 'react';
+import { styled } from '@mui/material/styles';
+import type { GetStaticProps, NextPage } from 'next';
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Head from 'next/head';
+import Link from 'next/link';
+import { Button } from '@mui/material';
 import styles from '@/styles/Home.module.css';
-import { makeStyles } from '@material-ui/core/styles';
-import { i18n, Link, withTranslation } from 'i18n';
-// import Header from '@/components/Header';
-// import Footer from '@/components/Footer';
 
-import Header from '@/components/Header/Header.js';
-import HeaderLinks from '@/components/Header/HeaderLinks.js';
-import Footer from '@/components/Footer/Footer.js';
+import Header from '@/components/Header/Header';
+import HeaderLinks from '@/components/Header/HeaderLinks';
+import Footer from '@/components/Footer/Footer';
 import GridContainer from '@/components/Grid/GridContainer.js';
 import GridItem from '@/components/Grid/GridItem.js';
-
 import Parallax from '@/components/Parallax/Parallax.js';
 
-import { Button } from 'antd';
+const StyledContainer = styled('div')(({ theme }) => ({
+  padding: theme.spacing(2),
+  backgroundColor: theme.palette.background.default,
+}));
 
-import homeStyles from '@/styles/jss/material-kit-react/views/components.js';
+const StyledBrand = styled('div')(() => ({
+  padding: '3rem 0',
+  textAlign: 'center',
+  '& h1': {
+    fontSize: '4.2rem',
+    fontWeight: '600',
+    display: 'inline-block',
+    position: 'relative',
+  },
+  '& h3': {
+    fontSize: '1.313rem',
+    maxWidth: '500px',
+    margin: '10px auto 0',
+  },
+}));
 
-const useStyles = makeStyles(homeStyles);
-
-function Home(props): JSX.Element {
-  const t = props.t;
-  const classes = useStyles();
-  const { ...rest } = props;
+const Home: NextPage = () => {
+  const { t, i18n } = useTranslation('common');
 
   return (
-    <div className={styles.container}>
+    <StyledContainer>
       <Head>
-        <title>Welcome to Hello Next.js</title>
+        <title>{t('welcome')}</title>
+        <meta name="description" content="Welcome to Next.js" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      {/* <Header title={t('h1')} /> */}
-
       <Header
-        brand="Hello Next.js"
+        brand="NextJS Material Kit"
         rightLinks={<HeaderLinks />}
         fixed
         color="transparent"
@@ -43,19 +56,16 @@ function Home(props): JSX.Element {
           height: 400,
           color: 'white',
         }}
-        {...rest}
       />
 
-      <Parallax image={'/static/img/bg4.jpg'}>
-        <div className={classes.container}>
+      <Parallax image="/static/img/bg4.jpg">
+        <div>
           <GridContainer>
             <GridItem>
-              <div className={classes.brand}>
-                <h1 className={classes.title}>Hello Next.js</h1>
-                <h3 className={classes.subtitle}>
-                  A Badass Material-UI Kit based on Material Design.
-                </h3>
-              </div>
+              <StyledBrand>
+                <h1>{t('welcome')}</h1>
+                <h3>A Badass Material-UI Kit based on Material Design.</h3>
+              </StyledBrand>
             </GridItem>
           </GridContainer>
         </div>
@@ -64,7 +74,8 @@ function Home(props): JSX.Element {
       <main className={styles.main}>
         <section>
           <Button
-            type="primary"
+            variant="contained"
+            color="primary"
             onClick={() => i18n.changeLanguage(i18n.language === 'en' ? 'zh' : 'en')}
           >
             {t('change-locale')}
@@ -72,23 +83,23 @@ function Home(props): JSX.Element {
         </section>
 
         <div className={styles.grid}>
-          <Link href="/demo">
-            <Button type="link">{t('to-second-page')}</Button>
+          <Link href="/demo" passHref>
+            <Button color="primary">{t('to-second-page')}</Button>
           </Link>
         </div>
       </main>
 
       <Footer />
-    </div>
+    </StyledContainer>
   );
-}
-
-Home.getInitialProps = async () => ({
-  namespacesRequired: ['common', 'footer'],
-});
-
-Home.propTypes = {
-  t: PropTypes.func.isRequired,
 };
 
-export default withTranslation('common')(Home);
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale || 'en', ['common'])),
+    },
+  };
+};
+
+export default Home;

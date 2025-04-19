@@ -1,25 +1,14 @@
-import React from 'react';
+// @mui/material components
+import { styled } from '@mui/material/styles';
 
-// mterial-ui components
-import { makeStyles } from '@material-ui/core/styles';
+import styles from '@/styles/jss/material-kit-react/components/clearfixStyle.js';
 
-const styles = {
-  clearfix: {
-    '&:after,&:before': {
-      display: 'table',
-      content: '" "',
-    },
-    '&:after': {
-      clear: 'both',
-    },
-  },
-};
-
-const useStyles = makeStyles(styles);
+const StyledDiv = styled('div')(({ _theme }) => ({
+  ...styles.clearfix,
+}));
 
 export default function Clearfix() {
-  const classes = useStyles();
-  return <div className={classes.clearfix} />;
+  return <StyledDiv />;
 }
 
 Clearfix.propTypes = {};

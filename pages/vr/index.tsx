@@ -1,21 +1,20 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import Head from 'next/head';
-import start from '../../utils/vr';
-
+import dynamic from 'next/dynamic';
 import styles from '@/styles/VR.module.scss';
 
-function VR(): JSX.Element {
-  useEffect(() => {
-    start();
-  }, []);
+// Dynamically import the VR component with no SSR
+const VRScene = dynamic(() => import('../../components/VRScene/VRScene'), {
+  ssr: false,
+});
 
+function VR(): JSX.Element {
   return (
     <div className={styles.root}>
       <Head>
         <title>Next.js VR</title>
       </Head>
-
-      <div id="vrApp"></div>
+      <VRScene />
     </div>
   );
 }

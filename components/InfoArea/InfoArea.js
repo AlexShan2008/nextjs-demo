@@ -1,37 +1,54 @@
-import React from 'react';
 // nodejs library to set properties for components
 import PropTypes from 'prop-types';
-// nodejs library that concatenates classes
-import classNames from 'classnames';
-// @material-ui/core components
-import { makeStyles } from '@material-ui/core/styles';
+// @mui/material components
+import { styled } from '@mui/material/styles';
 
 import styles from '@/styles/jss/material-kit-react/components/infoStyle.js';
 
-const useStyles = makeStyles(styles);
+const StyledDiv = styled('div')(({ theme }) => ({
+  ...styles.infoArea,
+  '& .iconWrapper': {
+    ...styles.iconWrapper,
+    '&.grayColor': {
+      backgroundColor: theme.palette.grey[700],
+    },
+    '&.primaryColor': {
+      backgroundColor: theme.palette.primary.main,
+    },
+    '&.infoColor': {
+      backgroundColor: theme.palette.info.main,
+    },
+    '&.successColor': {
+      backgroundColor: theme.palette.success.main,
+    },
+    '&.warningColor': {
+      backgroundColor: theme.palette.warning.main,
+    },
+    '&.dangerColor': {
+      backgroundColor: theme.palette.error.main,
+    },
+    '&.roseColor': {
+      backgroundColor: theme.palette.rose.main,
+    },
+  },
+  '& .descriptionWrapper': styles.descriptionWrapper,
+  '& .title': styles.title,
+  '& .description': styles.description,
+  '& .icon': styles.icon,
+}));
 
 export default function InfoArea(props) {
-  const classes = useStyles();
   const { title, description, iconColor, vertical } = props;
-  const iconWrapper = classNames({
-    [classes.iconWrapper]: true,
-    [classes[iconColor]]: true,
-    [classes.iconWrapperVertical]: vertical,
-  });
-  const iconClasses = classNames({
-    [classes.icon]: true,
-    [classes.iconVertical]: vertical,
-  });
   return (
-    <div className={classes.infoArea}>
-      <div className={iconWrapper}>
-        <props.icon className={iconClasses} />
+    <StyledDiv className={vertical ? 'vertical' : ''}>
+      <div className={`iconWrapper ${iconColor}`}>
+        {typeof props.icon === 'string' ? <props.icon className="icon" /> : <props.icon />}
       </div>
-      <div className={classes.descriptionWrapper}>
-        <h4 className={classes.title}>{title}</h4>
-        <p className={classes.description}>{description}</p>
+      <div className="descriptionWrapper">
+        <h4 className="title">{title}</h4>
+        <p className="description">{description}</p>
       </div>
-    </div>
+    </StyledDiv>
   );
 }
 
@@ -40,7 +57,7 @@ InfoArea.defaultProps = {
 };
 
 InfoArea.propTypes = {
-  icon: PropTypes.object.isRequired,
+  icon: PropTypes.oneOfType([PropTypes.object, PropTypes.string]).isRequired,
   title: PropTypes.string.isRequired,
   description: PropTypes.string.isRequired,
   iconColor: PropTypes.oneOf(['primary', 'warning', 'danger', 'success', 'info', 'rose', 'gray']),

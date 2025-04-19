@@ -1,7 +1,8 @@
 {
-  "h1": "一个简单的 DEMO",
-  "change-locale": "更换语言",
-  "to-second-page": "去 demo 页面",
-  "error-with-status": "A {{statusCode}} error occurred on server",
-  "error-without-status": "An error occurred on the server"
+  "welcome": "欢迎使用 Next.js",
+  "change-locale": "切换语言",
+  "to-second-page": "前往演示页面",
+  "back-to-home": "返回首页",
+  "error-with-status": "服务器发生 {{statusCode}} 错误",
+  "error-without-status": "服务器发生错误"
 }

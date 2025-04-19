@@ -3,185 +3,275 @@ import * as THREE from 'three';
 import { isMobile } from './browser.js';
 
 let scene, camera, renderer;
-
 let interactiveFlag = false;
+let animationFrameId = null;
 
-// solve the serve render does not has the window Object
+// Handle server-side rendering where window is undefined
 if (typeof window === 'undefined') {
   global.window = {
-    navigator: {
-      userAgent: '',
-    },
-    location: {
-      href: '',
-    },
+    navigator: { userAgent: '' },
+    location: { href: '' },
   };
 }
 
-const w = window.innerWidth,
-  h = window.innerHeight;
-
-let lon = 90, // 把鼠标在屏幕上的横偏移量 作为 作为旋转角度的基准
-  lat = 0, // 把鼠标在屏幕上的纵偏移量 作为 作为旋转角度的基准
-  phi = 0, // 相机的横屏面 到 y轴的弧度
-  theta = 0, // x相机的竖切面 到 x州的偏移弧度
-  target = new THREE.Vector3(); // 相机 看向的 那个方向
-
-let startX, startY, startLon, startLat;
-
-const init = () => {
-  if (typeof document == 'undefined') {
-    return;
-  }
-
-  // 初始化
-  const app = document.getElementById('vrApp');
-
-  // 创造场景
-  scene = new THREE.Scene();
-
-  // 创造相机
-  camera = new THREE.PerspectiveCamera(75, w / h, 0.1, 1000);
-  camera.position.set(0, -0, 0); // 设置相机位置
-  camera.lookPoint = {}; // 观察点
-  camera.lookPoint.x = 0;
-  camera.lookPoint.y = 0;
-  camera.lookPoint.z = -1;
-  camera.lookAt(camera.lookPoint.x, camera.lookPoint.y, camera.lookPoint.z);
-
-  // 创造渲染器
-  renderer = new THREE.WebGLRenderer({ antialias: true }); // 反走样，防止照片周边放大出现锯齿状
-  renderer.setSize(w, h);
-  renderer.setPixelRatio(window.devicePixelRatio);
-  app.appendChild(renderer.domElement);
-
-  // 创建立方体
-  createMesh();
-
-  if (isMobile) {
-    // handle finger touch
-    app.addEventListener('touchstart', handleTouchStart);
-    app.addEventListener('touchmove', handleTouchMove);
-    app.addEventListener('touchend', handleTouchEnd);
-  } else {
-    // PC handle mouse click
-    app.addEventListener('mousedown', handleMouseDown);
-    app.addEventListener('mousemove', handleMouseMove);
-    app.addEventListener('mouseup', handleMouseEnd);
-    app.addEventListener('mouseout', handleMouseEnd);
-  }
+// Initial camera angles and target
+const cameraState = {
+  lon: 90, // Initial longitude
+  lat: 0, // Initial latitude
+  phi: 0, // Camera's horizontal angle
+  theta: 0, // Camera's vertical angle
+  target: new THREE.Vector3(),
 };
 
-// 创建 几何体、材质、模型、立方体纹理
-const createMesh = () => {
-  const baseUrl = '/static/images/vr/';
+let pointerState = {
+  startX: 0,
+  startY: 0,
+  startLon: 0,
+  startLat: 0,
+};
 
-  const textureLoader = new THREE.CubeTextureLoader().setPath(baseUrl); // 立方纹理
-  const arr = ['f.jpg', 'b.jpg', 'u.jpg', 'd.jpg', 'l.jpg', 'r.jpg']; // 6张纹理图依次贴在立方体的x正(前)、x负（后）、y负（上）、y正（下）、z负（左）、z正（右） 的 顺序放置的
-  const texture = textureLoader.load(arr);
-  const geometry = new THREE.BoxGeometry(50, 50, 50); // 几何体
-  const material = new THREE.MeshPhongMaterial({
-    envMap: texture,
-    side: THREE.DoubleSide,
+const cleanup = () => {
+  if (typeof window === 'undefined') return;
+
+  if (renderer) {
+    renderer.dispose();
+    renderer.domElement.remove();
+  }
+  if (scene) {
+    scene.traverse((object) => {
+      if (object instanceof THREE.Mesh) {
+        if (object.geometry) {
+          object.geometry.dispose();
+        }
+        if (object.material) {
+          if (object.material.map) {
+            object.material.map.dispose();
+          }
+          object.material.dispose();
+        }
+      }
+    });
+  }
+  if (animationFrameId) {
+    cancelAnimationFrame(animationFrameId);
+  }
+
+  // Remove event listeners
+  const app = document.getElementById('vrApp');
+  if (app) {
+    if (isMobile) {
+      app.removeEventListener('touchstart', handleTouchStart);
+      app.removeEventListener('touchmove', handleTouchMove);
+      app.removeEventListener('touchend', handleTouchEnd);
+    } else {
+      app.removeEventListener('pointerdown', handlePointerDown);
+      app.removeEventListener('pointermove', handlePointerMove);
+      app.removeEventListener('pointerup', handlePointerEnd);
+      app.removeEventListener('pointerleave', handlePointerEnd);
+    }
+  }
+
+  // Reset variables
+  scene = null;
+  camera = null;
+  renderer = null;
+  interactiveFlag = false;
+  animationFrameId = null;
+};
+
+const init = () => {
+  if (typeof window === 'undefined') return;
+
+  // Clean up any existing scene
+  cleanup();
+
+  const app = document.getElementById('vrApp');
+  if (!app) return;
+
+  const w = window.innerWidth;
+  const h = window.innerHeight;
+
+  // Scene setup
+  scene = new THREE.Scene();
+
+  // Camera setup with correct initial position and parameters
+  camera = new THREE.PerspectiveCamera(75, w / h, 0.1, 1000);
+  camera.position.set(0, 0, 0);
+
+  // Set initial camera look direction
+  cameraState.phi = THREE.MathUtils.degToRad(90 - cameraState.lat);
+  cameraState.theta = THREE.MathUtils.degToRad(cameraState.lon);
+
+  cameraState.target.x = 500 * Math.sin(cameraState.phi) * Math.cos(cameraState.theta);
+  cameraState.target.y = 500 * Math.cos(cameraState.phi);
+  cameraState.target.z = 500 * Math.sin(cameraState.phi) * Math.sin(cameraState.theta);
+
+  camera.lookAt(cameraState.target);
+
+  // Modern WebGL renderer setup
+  renderer = new THREE.WebGLRenderer({
+    antialias: true,
+    powerPreference: 'high-performance',
+  });
+  renderer.setSize(w, h);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  app.appendChild(renderer.domElement);
+
+  // Handle window resize
+  const handleResize = () => {
+    const newW = window.innerWidth;
+    const newH = window.innerHeight;
+    camera.aspect = newW / newH;
+    camera.updateProjectionMatrix();
+    renderer.setSize(newW, newH);
+  };
+
+  window.addEventListener('resize', handleResize);
+
+  createEnvironment();
+  setupControls(app);
+
+  return () => {
+    window.removeEventListener('resize', handleResize);
+  };
+};
+
+const createEnvironment = () => {
+  if (typeof window === 'undefined') return;
+
+  const baseUrl = '/static/images/vr/';
+  const textureLoader = new THREE.CubeTextureLoader().setPath(baseUrl);
+
+  // Load environment map textures in correct order
+  const envMap = textureLoader.load([
+    'f.jpg', // front
+    'b.jpg', // back
+    'u.jpg', // up
+    'd.jpg', // down
+    'l.jpg', // left
+    'r.jpg', // right
+  ]);
+
+  // Create skybox geometry with correct size
+  const geometry = new THREE.BoxGeometry(500, 500, 500);
+  const material = new THREE.MeshBasicMaterial({
+    envMap,
+    side: THREE.BackSide,
   });
 
-  const cube = new THREE.Mesh(geometry, material); // 创建mesh
-  cube.position.set(-0, -0, -0);
-  scene.add(cube); // 加入场景
+  const skybox = new THREE.Mesh(geometry, material);
+  scene.add(skybox);
 
-  //环境光
+  // Add ambient light for consistent illumination
   const ambient = new THREE.AmbientLight(0xffffff);
   scene.add(ambient);
 };
 
-// just for test the camera position
-// function test() {
-//     camera.position.set(500, 300, 100);
-//     camera.lookAt(scene.position); // 相机 照 向 那个方向
-//     renderer.render(scene, camera);
-// }
+const updateCamera = () => {
+  if (!scene || !camera || !renderer) return;
 
-// 更新相机位置及朝向
-const update = () => {
   if (!interactiveFlag) {
-    lon += 0.05;
+    cameraState.lon += 0.05;
   }
 
-  lat = Math.max(-85, Math.min(85, lat));
-  phi = THREE.Math.degToRad(90 - lat);
-  theta = THREE.Math.degToRad(lon);
+  // Clamp latitude to prevent camera flipping
+  cameraState.lat = Math.max(-85, Math.min(85, cameraState.lat));
 
-  target.x = 500 * Math.sin(phi) * Math.cos(theta);
-  target.y = 500 * Math.cos(phi);
-  target.z = 500 * Math.sin(phi) * Math.sin(theta);
+  // Convert spherical coordinates to Cartesian
+  cameraState.phi = THREE.MathUtils.degToRad(90 - cameraState.lat);
+  cameraState.theta = THREE.MathUtils.degToRad(cameraState.lon);
 
-  camera.lookAt(target);
+  cameraState.target.x = 500 * Math.sin(cameraState.phi) * Math.cos(cameraState.theta);
+  cameraState.target.y = 500 * Math.cos(cameraState.phi);
+  cameraState.target.z = 500 * Math.sin(cameraState.phi) * Math.sin(cameraState.theta);
 
+  camera.lookAt(cameraState.target);
   renderer.render(scene, camera);
 };
 
-const animate = () => {
-  renderer.render(scene, camera);
-  requestAnimationFrame(animate);
-  update();
+const setupControls = (element) => {
+  if (typeof window === 'undefined') return;
+
+  if (isMobile) {
+    element.addEventListener('touchstart', handleTouchStart, { passive: false });
+    element.addEventListener('touchmove', handleTouchMove, { passive: false });
+    element.addEventListener('touchend', handleTouchEnd, { passive: false });
+  } else {
+    element.addEventListener('pointerdown', handlePointerDown);
+    element.addEventListener('pointermove', handlePointerMove);
+    element.addEventListener('pointerup', handlePointerEnd);
+    element.addEventListener('pointerleave', handlePointerEnd);
+  }
 };
 
 const handleTouchStart = (e) => {
   e.preventDefault();
-
   interactiveFlag = true;
-
-  startX = e.touches[0].pageX;
-  startY = e.touches[0].pageY;
-  startLon = lon;
-  startLat = lat;
+  pointerState = {
+    startX: e.touches[0].pageX,
+    startY: e.touches[0].pageY,
+    startLon: cameraState.lon,
+    startLat: cameraState.lat,
+  };
 };
 
 const handleTouchMove = (e) => {
   e.preventDefault();
-  lon = (startX - e.touches[0].pageX) * 0.2 + startLon;
-  lat = (e.touches[0].pageY - startY) * 0.2 + startLat;
-  update();
+  if (!interactiveFlag) return;
+
+  cameraState.lon = (pointerState.startX - e.touches[0].pageX) * 0.2 + pointerState.startLon;
+  cameraState.lat = (e.touches[0].pageY - pointerState.startY) * 0.2 + pointerState.startLat;
+  updateCamera();
 };
 
 const handleTouchEnd = (e) => {
   e.preventDefault();
-
   interactiveFlag = false;
 };
 
-const handleMouseDown = (e) => {
-  interactiveFlag = true;
-
+const handlePointerDown = (e) => {
   e.preventDefault();
-  e = e || window.event;
-
-  startX = e.clientX;
-  startY = e.clientY;
-  startLon = lon;
-  startLat = lat;
+  interactiveFlag = true;
+  pointerState = {
+    startX: e.clientX,
+    startY: e.clientY,
+    startLon: cameraState.lon,
+    startLat: cameraState.lat,
+  };
 };
 
-const handleMouseMove = (e) => {
+const handlePointerMove = (e) => {
+  e.preventDefault();
   if (!interactiveFlag) return;
 
-  e.preventDefault();
-  e = e || window.event;
-
-  // 触点水平和垂直坐标
-  lon = (startX - e.clientX) * 0.2 + startLon;
-  lat = (e.clientY - startY) * 0.2 + startLat;
-  update();
+  cameraState.lon = (pointerState.startX - e.clientX) * 0.2 + pointerState.startLon;
+  cameraState.lat = (e.clientY - pointerState.startY) * 0.2 + pointerState.startLat;
+  updateCamera();
 };
 
-const handleMouseEnd = (e) => {
+const handlePointerEnd = (e) => {
   e.preventDefault();
   interactiveFlag = false;
+};
+
+const animate = () => {
+  if (!scene || !camera || !renderer) return;
+
+  animationFrameId = requestAnimationFrame(animate);
+  updateCamera();
 };
 
 const start = () => {
-  init();
+  if (typeof window === 'undefined') return () => {};
+
+  const cleanupResize = init();
   animate();
+
+  // Return cleanup function
+  return () => {
+    if (cleanupResize) cleanupResize();
+    cleanup();
+  };
 };
 
 export default start;

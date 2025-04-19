@@ -1,21 +1,24 @@
-import React from 'react';
 // nodejs library to set properties for components
 import PropTypes from 'prop-types';
-// @material-ui/core components
-import { makeStyles } from '@material-ui/core/styles';
-// core components
+// @mui/material components
+import { styled } from '@mui/material/styles';
+
 import styles from '@/styles/jss/material-kit-react/components/typographyStyle.js';
 
-const useStyles = makeStyles(styles);
+const StyledBlockquote = styled('blockquote')(({ _theme }) => ({
+  ...styles.defaultFontStyle,
+  ...styles.quote,
+  '& p': styles.quoteText,
+  '& small': styles.quoteAuthor,
+}));
 
 export default function Quote(props) {
   const { text, author } = props;
-  const classes = useStyles();
   return (
-    <blockquote className={classes.defaultFontStyle + ' ' + classes.quote}>
-      <p className={classes.quoteText}>{text}</p>
-      <small className={classes.quoteAuthor}>{author}</small>
-    </blockquote>
+    <StyledBlockquote>
+      <p>{text}</p>
+      {author && <small>{author}</small>}
+    </StyledBlockquote>
   );
 }
 

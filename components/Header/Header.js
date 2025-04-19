@@ -1,107 +1,139 @@
-import React from 'react';
-// nodejs library that concatenates classes
+import React, { useRef, useEffect } from 'react';
 import classNames from 'classnames';
-// nodejs library to set properties for components
 import PropTypes from 'prop-types';
-// @material-ui/core components
-import { makeStyles } from '@material-ui/core/styles';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import IconButton from '@material-ui/core/IconButton';
-import Button from '@material-ui/core/Button';
-import Hidden from '@material-ui/core/Hidden';
-import Drawer from '@material-ui/core/Drawer';
-// @material-ui/icons
-import Menu from '@material-ui/icons/Menu';
-// core components
+import { styled } from '@mui/material/styles';
+import AppBar from '@mui/material/AppBar';
+import Toolbar from '@mui/material/Toolbar';
+import IconButton from '@mui/material/IconButton';
+import Hidden from '@mui/material/Hidden';
+import Drawer from '@mui/material/Drawer';
+import Menu from '@mui/icons-material/Menu';
+import Link from 'next/link';
 import styles from '@/styles/jss/material-kit-react/components/headerStyle.js';
 
-const useStyles = makeStyles(styles);
+const StyledAppBar = styled(AppBar)(({ _theme }) => ({
+  ...styles.appBar,
+  '&.primary': styles.primary,
+  '&.info': styles.info,
+  '&.success': styles.success,
+  '&.warning': styles.warning,
+  '&.danger': styles.danger,
+  '&.transparent': styles.transparent,
+  '&.white': styles.white,
+  '&.rose': styles.rose,
+  '&.dark': styles.dark,
+  '&.absolute': styles.absolute,
+  '&.fixed': styles.fixed,
+}));
 
-export default function Header(props) {
-  const classes = useStyles();
+const StyledToolbar = styled(Toolbar)(({ _theme }) => ({
+  ...styles.container,
+}));
+
+const StyledButton = styled('div')(({ _theme }) => ({
+  ...styles.title,
+  textDecoration: 'none',
+  '&:hover': {
+    color: 'inherit',
+  },
+}));
+
+const StyledFlex = styled('div')(({ _theme }) => ({
+  ...styles.flex,
+}));
+
+const StyledDrawer = styled(Drawer)(({ _theme }) => ({
+  '& .MuiDrawer-paper': styles.drawerPaper,
+}));
+
+const StyledResponsive = styled('div')(({ _theme }) => ({
+  ...styles.appResponsive,
+}));
+
+export default function Header({
+  color = 'white',
+  rightLinks,
+  leftLinks,
+  brand,
+  fixed,
+  absolute,
+  changeColorOnScroll,
+}) {
   const [mobileOpen, setMobileOpen] = React.useState(false);
-  React.useEffect(() => {
-    if (props.changeColorOnScroll) {
+  const headerRef = useRef(null);
+
+  useEffect(() => {
+    if (changeColorOnScroll) {
       window.addEventListener('scroll', headerColorChange);
     }
     return function cleanup() {
-      if (props.changeColorOnScroll) {
+      if (changeColorOnScroll) {
         window.removeEventListener('scroll', headerColorChange);
       }
     };
   });
+
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
+
   const headerColorChange = () => {
-    const { color, changeColorOnScroll } = props;
+    if (!headerRef.current) return;
+
     const windowsScrollTop = window.pageYOffset;
+    const header = headerRef.current;
+
     if (windowsScrollTop > changeColorOnScroll.height) {
-      document.body.getElementsByTagName('header')[0].classList.remove(classes[color]);
-      document.body
-        .getElementsByTagName('header')[0]
-        .classList.add(classes[changeColorOnScroll.color]);
+      header.classList.remove(color);
+      header.classList.add(changeColorOnScroll.color);
     } else {
-      document.body.getElementsByTagName('header')[0].classList.add(classes[color]);
-      document.body
-        .getElementsByTagName('header')[0]
-        .classList.remove(classes[changeColorOnScroll.color]);
+      header.classList.add(color);
+      header.classList.remove(changeColorOnScroll.color);
     }
   };
-  const { color, rightLinks, leftLinks, brand, fixed, absolute } = props;
+
   const appBarClasses = classNames({
-    [classes.appBar]: true,
-    [classes[color]]: color,
-    [classes.absolute]: absolute,
-    [classes.fixed]: fixed,
+    [color]: color,
+    absolute: absolute,
+    fixed: fixed,
   });
-  const brandComponent = <Button className={classes.title}>{brand}</Button>;
+
+  const brandComponent = (
+    <Link href="/" passHref legacyBehavior>
+      <StyledButton>{brand}</StyledButton>
+    </Link>
+  );
+
   return (
-    <AppBar className={appBarClasses}>
-      <Toolbar className={classes.container}>
+    <StyledAppBar className={appBarClasses} ref={headerRef}>
+      <StyledToolbar>
         {leftLinks !== undefined ? brandComponent : null}
-        <div className={classes.flex}>
-          {leftLinks !== undefined ? (
-            <Hidden smDown implementation="css">
-              {leftLinks}
-            </Hidden>
-          ) : (
-            brandComponent
-          )}
-        </div>
-        <Hidden smDown implementation="css">
-          {rightLinks}
-        </Hidden>
+        <StyledFlex>
+          {leftLinks !== undefined ? <Hidden smDown>{leftLinks}</Hidden> : brandComponent}
+        </StyledFlex>
+        <Hidden smDown>{rightLinks}</Hidden>
         <Hidden mdUp>
           <IconButton color="inherit" aria-label="open drawer" onClick={handleDrawerToggle}>
             <Menu />
           </IconButton>
         </Hidden>
-      </Toolbar>
-      <Hidden mdUp implementation="js">
-        <Drawer
+      </StyledToolbar>
+      <Hidden mdUp>
+        <StyledDrawer
           variant="temporary"
           anchor={'right'}
           open={mobileOpen}
-          classes={{
-            paper: classes.drawerPaper,
-          }}
           onClose={handleDrawerToggle}
         >
-          <div className={classes.appResponsive}>
+          <StyledResponsive>
             {leftLinks}
             {rightLinks}
-          </div>
-        </Drawer>
+          </StyledResponsive>
+        </StyledDrawer>
       </Hidden>
-    </AppBar>
+    </StyledAppBar>
   );
 }
-
-Header.defaultProp = {
-  color: 'white',
-};
 
 Header.propTypes = {
   color: PropTypes.oneOf([
@@ -120,12 +152,6 @@ Header.propTypes = {
   brand: PropTypes.string,
   fixed: PropTypes.bool,
   absolute: PropTypes.bool,
-  // this will cause the sidebar to change the color from
-  // props.color (see above) to changeColorOnScroll.color
-  // when the window.pageYOffset is heigher or equal to
-  // changeColorOnScroll.height and then when it is smaller than
-  // changeColorOnScroll.height change it back to
-  // props.color (see above)
   changeColorOnScroll: PropTypes.shape({
     height: PropTypes.number.isRequired,
     color: PropTypes.oneOf([

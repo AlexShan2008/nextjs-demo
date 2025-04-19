@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
 import Head from 'next/head';
 import Link from 'next/link';
-import { Button } from 'antd';
+import { Button } from '@mui/material';
 import styles from '@/styles/Demo.module.scss';
-import { withTranslation } from 'i18n';
+import { useTranslation } from 'next-i18next';
+import { GetStaticProps } from 'next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
-function Demo({ t }) {
+export default function Demo() {
   const [count, setCount] = useState(0);
+  const { t } = useTranslation('common');
 
   return (
     <div className={styles.root}>
@@ -16,15 +18,14 @@ function Demo({ t }) {
       </Head>
 
       <main>
-        <Link href="/">
-          <a>
-            <Button type="link">{t('back-to-home')}</Button>
-          </a>
+        <Link href="/" passHref>
+          <Button variant="contained" color="primary">
+            {t('back-to-home')}
+          </Button>
         </Link>
 
         <div className={styles.content}>
           <p>You clicked {count} times</p>
-
           <Button onClick={() => setCount(count + 1)}>Click me</Button>
         </div>
       </main>
@@ -34,12 +35,10 @@ function Demo({ t }) {
   );
 }
 
-Demo.getInitialProps = async () => ({
-  namespacesRequired: ['demo'],
-});
-
-Demo.propTypes = {
-  t: PropTypes.func.isRequired,
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale || 'en', ['common'])),
+    },
+  };
 };
-
-export default withTranslation('demo')(Demo);

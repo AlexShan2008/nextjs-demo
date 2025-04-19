@@ -2,47 +2,62 @@
   "name": "nextjs-blog",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "packageManager": "pnpm@8.15.4",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "export": "next build && next export",
+    "export": "next export",
     "type-check": "tsc --pretty --noEmit",
     "format": "prettier --write \"**/*.{js,ts,tsx}\"",
-    "lint": "eslint . --ext ts --ext tsx --ext js"
+    "lint": "eslint . --ext ts --ext tsx --ext js",
+    "postinstall": "husky install"
   },
   "dependencies": {
-    "@material-ui/core": "^4.11.0",
-    "@material-ui/icons": "^4.9.1",
-    "antd": "^4.5.4",
+    "@emotion/cache": "^11.11.0",
+    "@emotion/react": "^11.11.4",
+    "@emotion/server": "^11.11.0",
+    "@emotion/styled": "^11.11.0",
+    "@mui/icons-material": "^5.15.12",
+    "@mui/material": "^5.15.12",
     "bowser": "^2.11.0",
-    "cookie": "^0.4.1",
-    "next": "9.5.2",
-    "next-i18next": "^6.0.2",
-    "react": "16.13.1",
-    "react-dom": "16.13.1",
-    "react-router-dom": "^5.2.0",
-    "recoil": "0.0.13",
-    "sass": "^1.26.10",
-    "swr": "^0.3.0",
-    "three": "^0.120.1"
+    "classnames": "^2.5.1",
+    "cookie": "^0.6.0",
+    "moment": "^2.30.1",
+    "next": "^14.1.3",
+    "next-i18next": "^15.2.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "recoil": "^0.7.7",
+    "sass": "^1.71.1",
+    "swr": "^2.2.5",
+    "three": "^0.162.0"
   },
   "devDependencies": {
-    "@types/react": "^16.9.46",
-    "@typescript-eslint/eslint-plugin": "^3.9.1",
-    "eslint": "^7.7.0",
-    "eslint-config-airbnb-typescript": "^9.0.0",
-    "eslint-config-prettier": "^6.11.0",
-    "eslint-plugin-import": "^2.22.0",
-    "eslint-plugin-jsx-a11y": "^6.3.1",
-    "eslint-plugin-react": "^7.20.6",
-    "eslint-plugin-react-hooks": "^4.1.0",
-    "husky": "^4.2.5",
-    "lint-staged": "^10.2.11",
-    "postcss-flexbugs-fixes": "^4.2.1",
-    "postcss-preset-env": "^6.7.0",
-    "prettier": "^2.0.5",
-    "typescript": "^3.9.7"
+    "@types/moment": "^2.13.0",
+    "@types/node": "^20.11.24",
+    "@types/react": "^18.2.61",
+    "@types/react-dom": "^18.2.19",
+    "@typescript-eslint/eslint-plugin": "^7.1.0",
+    "@typescript-eslint/parser": "^7.1.0",
+    "eslint": "^8.57.0",
+    "eslint-config-next": "14.1.3",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-jsx-a11y": "^6.8.0",
+    "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "husky": "^9.0.11",
+    "lint-staged": "^15.2.2",
+    "postcss": "^8.4.35",
+    "postcss-flexbugs-fixes": "^5.0.2",
+    "postcss-preset-env": "^9.4.0",
+    "prettier": "^3.2.5",
+    "typescript": "^5.3.3"
   },
   "browserslist": [
     ">0.3%",
@@ -52,14 +67,14 @@
   ],
   "husky": {
     "hooks": {
-      "pre-commit": "lint-staged",
-      "pre-push": "yarn run type-check"
+      "pre-commit": "pnpm lint-staged",
+      "pre-push": "pnpm run type-check"
     }
   },
   "lint-staged": {
     "*.@(ts|tsx|js)": [
-      "yarn lint",
-      "yarn format"
+      "pnpm lint",
+      "pnpm format"
     ]
   }
 }

@@ -1,18 +1,24 @@
-import React from 'react';
 // nodejs library to set properties for components
 import PropTypes from 'prop-types';
-
-// @material-ui/core components
-import { makeStyles } from '@material-ui/core/styles';
+// @mui/material components
+import { styled } from '@mui/material/styles';
 
 import styles from '@/styles/jss/material-kit-react/components/badgeStyle.js';
 
-const useStyles = makeStyles(styles);
+const StyledSpan = styled('span')(({ _theme }) => ({
+  ...styles.badge,
+  '&.primary': styles.primary,
+  '&.warning': styles.warning,
+  '&.danger': styles.danger,
+  '&.success': styles.success,
+  '&.info': styles.info,
+  '&.rose': styles.rose,
+  '&.gray': styles.gray,
+}));
 
 export default function Badge(props) {
-  const classes = useStyles();
   const { color, children } = props;
-  return <span className={classes.badge + ' ' + classes[color]}>{children}</span>;
+  return <StyledSpan className={color}>{children}</StyledSpan>;
 }
 
 Badge.defaultProps = {

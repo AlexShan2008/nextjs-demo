@@ -1,27 +1,26 @@
-import React from 'react';
 // nodejs library to set properties for components
 import PropTypes from 'prop-types';
+// @mui/material components
+import { styled } from '@mui/material/styles';
+import LinearProgress from '@mui/material/LinearProgress';
 
-// @material-ui/core components
-import { makeStyles } from '@material-ui/core/styles';
-import LinearProgress from '@material-ui/core/LinearProgress';
-// core components
 import styles from '@/styles/jss/material-kit-react/components/customLinearProgressStyle.js';
 
-const useStyles = makeStyles(styles);
+const StyledLinearProgress = styled(LinearProgress)(({ _theme }) => ({
+  ...styles.root,
+  '&.primary': styles.primary,
+  '&.warning': styles.warning,
+  '&.danger': styles.danger,
+  '&.success': styles.success,
+  '&.info': styles.info,
+  '& .MuiLinearProgress-bar': {
+    ...styles.bar,
+  },
+}));
 
 export default function CustomLinearProgress(props) {
-  const classes = useStyles();
   const { color, ...rest } = props;
-  return (
-    <LinearProgress
-      {...rest}
-      classes={{
-        root: classes.root + ' ' + classes[color + 'Background'],
-        bar: classes.bar + ' ' + classes[color],
-      }}
-    />
-  );
+  return <StyledLinearProgress className={color} {...rest} />;
 }
 
 CustomLinearProgress.defaultProps = {
@@ -29,5 +28,5 @@ CustomLinearProgress.defaultProps = {
 };
 
 CustomLinearProgress.propTypes = {
-  color: PropTypes.oneOf(['primary', 'warning', 'danger', 'success', 'info', 'rose', 'gray']),
+  color: PropTypes.oneOf(['primary', 'warning', 'danger', 'success', 'info']),
 };

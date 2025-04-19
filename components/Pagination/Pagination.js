@@ -1,12 +1,11 @@
-import React from 'react';
 // nodejs library to set properties for components
 import PropTypes from 'prop-types';
 // nodejs library that concatenates classes
 import classNames from 'classnames';
 
 // @material-ui/core components
-import { makeStyles } from '@material-ui/core/styles';
-import Button from '@material-ui/core/Button';
+import { makeStyles } from '@mui/material/styles';
+import Button from '@mui/material/Button';
 
 import styles from '@/styles/jss/material-kit-react/components/paginationStyle.js';
 

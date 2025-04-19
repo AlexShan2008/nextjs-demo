@@ -1,21 +1,22 @@
+// Navigation items for the header
 export const NAV_LIST = [
   {
-    id: 1,
+    id: 'home',
     name: 'Home',
     href: '/',
   },
   {
-    id: 2,
+    id: 'demo',
     name: 'Demo',
     href: '/demo',
   },
   {
-    id: 3,
-    name: 'VR',
+    id: 'vr',
+    name: 'VR Demo',
     href: '/vr',
   },
   {
-    id: 4,
+    id: 'recoil',
     name: 'Recoil',
     href: '/recoil',
   },

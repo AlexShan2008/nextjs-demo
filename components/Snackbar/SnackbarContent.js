@@ -1,72 +1,67 @@
-import React from 'react';
+// nodejs library that concatenates classes
+import classNames from 'classnames';
 // nodejs library to set properties for components
 import PropTypes from 'prop-types';
-// @material-ui/core components
-import { makeStyles } from '@material-ui/core/styles';
-import Snack from '@material-ui/core/SnackbarContent';
-import IconButton from '@material-ui/core/IconButton';
-import Icon from '@material-ui/core/Icon';
-// @material-ui/icons
-import Close from '@material-ui/icons/Close';
-// core components
+// @mui/material components
+import { styled } from '@mui/material/styles';
+import SnackbarContent from '@mui/material/SnackbarContent';
+import IconButton from '@mui/material/IconButton';
+// @mui/icons-material
+import Close from '@mui/icons-material/Close';
 
 import styles from '@/styles/jss/material-kit-react/components/snackbarContentStyle.js';
 
-const useStyles = makeStyles(styles);
+const StyledSnackbarContent = styled(SnackbarContent)(({ _theme }) => ({
+  ...styles.root,
+  '&.info': styles.info,
+  '&.success': styles.success,
+  '&.warning': styles.warning,
+  '&.danger': styles.danger,
+  '&.primary': styles.primary,
+  '& .message': styles.message,
+  '& .icon': styles.icon,
+  '& .iconButton': styles.iconButton,
+  '& .iconMessage': styles.iconMessage,
+}));
 
-export default function SnackbarContent(props) {
+export default function Snackbar(props) {
   const { message, color, close, icon } = props;
-  const classes = useStyles();
-  var action = [];
-  const closeAlert = () => {
-    setAlert(null);
-  };
+  let action = [];
+  const messageClasses = classNames({
+    message: true,
+    iconMessage: icon !== undefined,
+  });
   if (close !== undefined) {
     action = [
       <IconButton
-        className={classes.iconButton}
+        className="iconButton"
         key="close"
         aria-label="Close"
         color="inherit"
-        onClick={closeAlert}
+        onClick={() => props.closeNotification()}
       >
-        <Close className={classes.close} />
+        <Close className="icon" />
       </IconButton>,
     ];
   }
-  let snackIcon = null;
-  switch (typeof icon) {
-    case 'object':
-      snackIcon = <props.icon className={classes.icon} />;
-      break;
-    case 'string':
-      snackIcon = <Icon className={classes.icon}>{props.icon}</Icon>;
-      break;
-    default:
-      snackIcon = null;
-      break;
-  }
-  const [alert, setAlert] = React.useState(
-    <Snack
+  return (
+    <StyledSnackbarContent
       message={
         <div>
-          {snackIcon}
-          {message}
-          {close !== undefined ? action : null}
+          {icon !== undefined ? <props.icon className="icon" /> : null}
+          <span className={messageClasses}>{message}</span>
         </div>
       }
-      classes={{
-        root: classes.root + ' ' + classes[color],
-        message: classes.message + ' ' + classes.container,
-      }}
-    />,
+      action={action}
+      className={color}
+    />
   );
-  return alert;
 }
 
-SnackbarContent.propTypes = {
+Snackbar.propTypes = {
   message: PropTypes.node.isRequired,
   color: PropTypes.oneOf(['info', 'success', 'warning', 'danger', 'primary']),
   close: PropTypes.bool,
-  icon: PropTypes.oneOfType([PropTypes.object, PropTypes.string]),
+  icon: PropTypes.object,
+  closeNotification: PropTypes.func,
 };

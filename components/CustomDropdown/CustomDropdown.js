@@ -1,26 +1,55 @@
 import React from 'react';
-// nodejs library that concatenates classes
 import classNames from 'classnames';
-// nodejs library to set properties for components
 import PropTypes from 'prop-types';
 
-// @material-ui/core components
-import { makeStyles } from '@material-ui/core/styles';
-import MenuItem from '@material-ui/core/MenuItem';
-import MenuList from '@material-ui/core/MenuList';
-import ClickAwayListener from '@material-ui/core/ClickAwayListener';
-import Paper from '@material-ui/core/Paper';
-import Grow from '@material-ui/core/Grow';
-import Divider from '@material-ui/core/Divider';
-import Icon from '@material-ui/core/Icon';
-import Popper from '@material-ui/core/Popper';
+// @mui/material components
+import MenuList from '@mui/material/MenuList';
+import ClickAwayListener from '@mui/material/ClickAwayListener';
+import Paper from '@mui/material/Paper';
+import Grow from '@mui/material/Grow';
+import Icon from '@mui/material/Icon';
+import Popper from '@mui/material/Popper';
+import { styled } from '@mui/material/styles';
 
 // core components
-import Button from 'components/CustomButtons/Button.js';
+import Button from '@/components/CustomButtons/Button.js';
 
-import styles from '@/styles/jss/material-kit-react/components/customDropdownStyle.js';
+// styled components
+import {
+  StyledDropdown,
+  StyledDropdownItem,
+  StyledDivider,
+  StyledButtonIcon,
+  StyledCaret,
+  StyledDropdownHeader,
+} from '@/styles/jss/material-kit-react/components/customDropdownStyle.js';
 
-const useStyles = makeStyles(styles);
+// Create styled components
+const StyledMenuList = styled(MenuList)({
+  padding: '0',
+});
+
+const StyledPaper = styled(Paper)({
+  ...StyledDropdown,
+});
+
+const StyledPopper = styled(Popper)(({ theme }) => ({
+  zIndex: '1200',
+  [theme.breakpoints.down('sm')]: {
+    zIndex: '1640',
+    position: 'static',
+    float: 'none',
+    width: 'auto',
+    marginTop: '0',
+    backgroundColor: 'transparent',
+    border: '0',
+    boxShadow: 'none',
+    color: 'black',
+  },
+  '&.closed': {
+    pointerEvents: 'none',
+  },
+}));
 
 export default function CustomDropdown(props) {
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -43,7 +72,7 @@ export default function CustomDropdown(props) {
     }
     setAnchorEl(null);
   };
-  const classes = useStyles();
+
   const {
     buttonText,
     buttonIcon,
@@ -55,31 +84,32 @@ export default function CustomDropdown(props) {
     hoverColor,
     left,
     rtlActive,
-    noLiPadding,
   } = props;
+
   const caretClasses = classNames({
-    [classes.caret]: true,
-    [classes.caretActive]: Boolean(anchorEl),
-    [classes.caretRTL]: rtlActive,
+    [StyledCaret]: true,
+    active: Boolean(anchorEl),
+    rtl: rtlActive,
   });
-  const dropdownItem = classNames({
-    [classes.dropdownItem]: true,
-    [classes[hoverColor + 'Hover']]: true,
-    [classes.noLiPadding]: noLiPadding,
-    [classes.dropdownItemRTL]: rtlActive,
+
+  const dropdownItemClasses = classNames({
+    [`${hoverColor}Hover`]: true,
+    rtl: rtlActive,
   });
+
   let icon = null;
   switch (typeof buttonIcon) {
     case 'object':
-      icon = <props.buttonIcon className={classes.buttonIcon} />;
+      icon = <StyledButtonIcon as={props.buttonIcon} />;
       break;
     case 'string':
-      icon = <Icon className={classes.buttonIcon}>{props.buttonIcon}</Icon>;
+      icon = <StyledButtonIcon as={Icon}>{props.buttonIcon}</StyledButtonIcon>;
       break;
     default:
       icon = null;
       break;
   }
+
   return (
     <div>
       <div>
@@ -92,19 +122,16 @@ export default function CustomDropdown(props) {
         >
           {icon}
           {buttonText !== undefined ? buttonText : null}
-          {caret ? <b className={caretClasses} /> : null}
+          {caret ? <StyledCaret className={caretClasses} active={Boolean(anchorEl)} /> : null}
         </Button>
       </div>
-      <Popper
+      <StyledPopper
         open={Boolean(anchorEl)}
         anchorEl={anchorEl}
         transition
         disablePortal
         placement={dropup ? (left ? 'top-start' : 'top') : left ? 'bottom-start' : 'bottom'}
-        className={classNames({
-          [classes.popperClose]: !anchorEl,
-          [classes.popperResponsive]: true,
-        })}
+        className={!anchorEl ? 'closed' : ''}
       >
         {() => (
           <Grow
@@ -112,51 +139,37 @@ export default function CustomDropdown(props) {
             id="menu-list"
             style={dropup ? { transformOrigin: '0 100% 0' } : { transformOrigin: '0 0 0' }}
           >
-            <Paper className={classes.dropdown}>
+            <StyledPaper>
               <ClickAwayListener onClickAway={handleCloseAway}>
-                <MenuList role="menu" className={classes.menuList}>
+                <StyledMenuList role="menu">
                   {dropdownHeader !== undefined ? (
-                    <MenuItem
-                      onClick={() => handleClose(dropdownHeader)}
-                      className={classes.dropdownHeader}
-                    >
+                    <StyledDropdownHeader onClick={() => handleClose(dropdownHeader)}>
                       {dropdownHeader}
-                    </MenuItem>
+                    </StyledDropdownHeader>
                   ) : null}
                   {dropdownList.map((prop, key) => {
                     if (prop.divider) {
-                      return (
-                        <Divider
-                          key={key}
-                          onClick={() => handleClose('divider')}
-                          className={classes.dropdownDividerItem}
-                        />
-                      );
+                      return <StyledDivider key={key} onClick={() => handleClose('divider')} />;
                     }
                     return (
-                      <MenuItem
+                      <StyledDropdownItem
                         key={key}
                         onClick={() => handleClose(prop)}
-                        className={dropdownItem}
+                        className={dropdownItemClasses}
                       >
                         {prop}
-                      </MenuItem>
+                      </StyledDropdownItem>
                     );
                   })}
-                </MenuList>
+                </StyledMenuList>
               </ClickAwayListener>
-            </Paper>
+            </StyledPaper>
           </Grow>
         )}
-      </Popper>
+      </StyledPopper>
     </div>
   );
 }
-
-CustomDropdown.defaultProps = {
-  caret: true,
-  hoverColor: 'primary',
-};
 
 CustomDropdown.propTypes = {
   hoverColor: PropTypes.oneOf(['black', 'primary', 'info', 'success', 'warning', 'danger', 'rose']),
@@ -169,7 +182,6 @@ CustomDropdown.propTypes = {
   rtlActive: PropTypes.bool,
   caret: PropTypes.bool,
   left: PropTypes.bool,
-  noLiPadding: PropTypes.bool,
   // function that retuns the selected item
   onClick: PropTypes.func,
 };

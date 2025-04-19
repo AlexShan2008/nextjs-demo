@@ -1,120 +1,105 @@
 /*eslint-disable*/
+
+// nodejs library to set properties for components
+import PropTypes from 'prop-types';
+import IconButton from '@mui/material/IconButton';
+// Next.js Link component
+import Link from 'next/link';
 import React from 'react';
-import DeleteIcon from '@material-ui/icons/Delete';
-import IconButton from '@material-ui/core/IconButton';
-// react components for routing our app without refresh
-import { Link } from 'react-router-dom';
 
-// @material-ui/core components
-import { makeStyles } from '@material-ui/core/styles';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import Tooltip from '@material-ui/core/Tooltip';
+// @mui/material components
+import { styled } from '@mui/material/styles';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import Tooltip from '@mui/material/Tooltip';
 
-// @material-ui/icons
-import { Apps, CloudDownload } from '@material-ui/icons';
+// @mui/icons-material
+import { Apps, CloudDownload } from '@mui/icons-material';
 
 // core components
 import CustomDropdown from '@/components/CustomDropdown/CustomDropdown.js';
 import Button from '@/components/CustomButtons/Button.js';
+import { NAV_LIST } from '@/components/Header/data.js';
 
-import styles from '@/styles/jss/material-kit-react/components/headerLinksStyle.js';
+const StyledList = styled(List)(({ theme }) => ({
+  fontSize: '14px',
+  margin: 0,
+  paddingLeft: '0',
+  listStyle: 'none',
+  paddingTop: '0',
+  paddingBottom: '0',
+  color: 'inherit',
+  display: 'flex',
+  [theme.breakpoints.down('md')]: {
+    flexDirection: 'column',
+  },
+}));
 
-const useStyles = makeStyles(styles);
+const StyledListItem = styled(ListItem)(({ theme }) => ({
+  float: 'left',
+  color: 'inherit',
+  position: 'relative',
+  display: 'block',
+  width: 'auto',
+  margin: '0',
+  padding: '0',
+  [theme.breakpoints.down('md')]: {
+    width: '100%',
+    '&:not(:last-of-type)': {
+      '&::after': {
+        width: 'calc(100% - 30px)',
+        content: '""',
+        display: 'block',
+        height: '1px',
+        marginLeft: '15px',
+        backgroundColor: '#e5e5e5',
+      },
+    },
+  },
+}));
 
-export default function HeaderLinks(props) {
-  const classes = useStyles();
+const StyledLink = styled('a')(({ theme }) => ({
+  color: 'inherit',
+  position: 'relative',
+  padding: '0.9375rem',
+  fontWeight: '400',
+  fontSize: '12px',
+  textTransform: 'uppercase',
+  borderRadius: '3px',
+  lineHeight: '20px',
+  textDecoration: 'none',
+  margin: '0px',
+  display: 'inline-flex',
+  '&:hover,&:focus': {
+    color: 'inherit',
+    background: 'rgba(200, 200, 200, 0.2)',
+  },
+  [theme.breakpoints.down('md')]: {
+    width: 'calc(100% - 30px)',
+    marginLeft: '15px',
+    marginBottom: '8px',
+    marginTop: '8px',
+    textAlign: 'left',
+    '& > span:not(:first-of-type)': {
+      justifyContent: 'flex-start',
+    },
+  },
+}));
+
+export default function HeaderLinks() {
   return (
-    <List className={classes.list}>
-      <ListItem className={classes.listItem}>
-        <CustomDropdown
-          noLiPadding
-          buttonText="Components"
-          buttonProps={{
-            className: classes.navLink,
-            color: 'transparent',
-          }}
-          buttonIcon={Apps}
-          dropdownList={[
-            <Link to="/" className={classes.dropdownLink}>
-              All components
-            </Link>,
-            <a
-              href="https://creativetimofficial.github.io/material-kit-react/#/documentation?ref=mkr-navbar"
-              target="_blank"
-              className={classes.dropdownLink}
-            >
-              Documentation
-            </a>,
-          ]}
-        />
-      </ListItem>
-      <ListItem className={classes.listItem}>
-        <Button
-          href="https://www.creative-tim.com/product/material-kit-react?ref=mkr-navbar"
-          color="transparent"
-          target="_blank"
-          className={classes.navLink}
-        >
-          <CloudDownload className={classes.icons} /> Download
-        </Button>
-      </ListItem>
-      <ListItem className={classes.listItem}>
-        {/*<Tooltip title="Delete">
-          <IconButton aria-label="Delete">
-            <DeleteIcon />
-          </IconButton>
-        </Tooltip>*/}
-        <Tooltip
-          id="instagram-twitter"
-          title="Follow us on twitter"
-          placement={window.innerWidth > 959 ? 'top' : 'left'}
-          classes={{ tooltip: classes.tooltip }}
-        >
-          <Button
-            href="https://twitter.com/CreativeTim?ref=creativetim"
-            target="_blank"
-            color="transparent"
-            className={classes.navLink}
-          >
-            <i className={classes.socialIcons + ' fab fa-twitter'} />
-          </Button>
-        </Tooltip>
-      </ListItem>
-      <ListItem className={classes.listItem}>
-        <Tooltip
-          id="instagram-facebook"
-          title="Follow us on facebook"
-          placement={window.innerWidth > 959 ? 'top' : 'left'}
-          classes={{ tooltip: classes.tooltip }}
-        >
-          <Button
-            color="transparent"
-            href="https://www.facebook.com/CreativeTim?ref=creativetim"
-            target="_blank"
-            className={classes.navLink}
-          >
-            <i className={classes.socialIcons + ' fab fa-facebook'} />
-          </Button>
-        </Tooltip>
-      </ListItem>
-      <ListItem className={classes.listItem}>
-        <Tooltip
-          id="instagram-tooltip"
-          title="Follow us on instagram"
-          placement={window.innerWidth > 959 ? 'top' : 'left'}
-          classes={{ tooltip: classes.tooltip }}
-        >
-          <Button
-            color="transparent"
-            href="https://www.instagram.com/CreativeTimOfficial?ref=creativetim"
-            target="_blank"
-            className={classes.navLink}
-          >
-            <i className={classes.socialIcons + ' fab fa-instagram'} />
-          </Button>
-        </Tooltip>
-      </ListItem>
-    </List>
+    <StyledList>
+      {NAV_LIST.map((nav) => (
+        <StyledListItem key={nav.id}>
+          <Link href={nav.href} passHref legacyBehavior>
+            <StyledLink>{nav.name}</StyledLink>
+          </Link>
+        </StyledListItem>
+      ))}
+    </StyledList>
   );
 }
+
+HeaderLinks.propTypes = {
+  classes: PropTypes.object,
+};

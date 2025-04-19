@@ -1,36 +1,31 @@
-import React from 'react';
 // nodejs library to set properties for components
 import PropTypes from 'prop-types';
+// @mui/material components
+import { styled } from '@mui/material/styles';
+import Grid from '@mui/material/Grid';
 
-// @material-ui/core components
-import { makeStyles } from '@material-ui/core/styles';
-import Grid from '@material-ui/core/Grid';
-
-const styles = {
-  grid: {
-    marginRight: '-15px',
-    marginLeft: '-15px',
-    width: 'auto',
+const StyledGrid = styled(Grid)(({ theme }) => ({
+  width: '100%',
+  margin: '0 auto',
+  padding: `${theme.spacing(1)} !important`,
+  '&::before, &::after': {
+    display: 'table',
+    content: '" "',
   },
-};
-
-const useStyles = makeStyles(styles);
+  '&::after': {
+    clear: 'both',
+  },
+}));
 
 export default function GridContainer(props) {
-  const classes = useStyles();
-  const { children, className, ...rest } = props;
+  const { children, ...rest } = props;
   return (
-    <Grid container {...rest} className={classes.grid + ' ' + className}>
+    <StyledGrid container {...rest}>
       {children}
-    </Grid>
+    </StyledGrid>
   );
 }
 
-GridContainer.defaultProps = {
-  className: '',
-};
-
 GridContainer.propTypes = {
   children: PropTypes.node,
-  className: PropTypes.string,
 };

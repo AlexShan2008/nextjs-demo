@@ -1,41 +1,57 @@
-import App from 'next/app';
-import type { AppProps /*, AppContext */ } from 'next/app';
-import { ConfigProvider } from 'antd';
-// 由于 antd 组件的默认文案是英文，所以需要修改为中文
-// import zhCN from 'antd/es/locale/zh_CN';
-import zhCN from 'antd/lib/locale-provider/zh_CN'; // fix: SyntaxError: Cannot use import statement outside a module
+import Head from 'next/head';
+import React from 'react';
+import { AppProps } from 'next/app';
+import { ThemeProvider } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
+import { CacheProvider, EmotionCache } from '@emotion/react';
+import { RecoilRoot } from 'recoil';
+import { appWithTranslation } from 'next-i18next';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
-import 'antd/dist/antd.css';
-import '../styles/globals.css';
-import { appWithTranslation } from '../i18n';
-import { RecoilRoot } from 'recoil';
-
+import '@/styles/globals.css';
 import '@/styles/scss/material-kit-react.scss?v=1.9.0';
+import theme from '@/styles/theme';
+import createEmotionCache from '@/utils/createEmotionCache';
+import App from 'next/app';
 
-moment.locale('zh-cn');
+// Client-side cache, shared for the whole session of the user in the browser.
+const clientSideEmotionCache = createEmotionCache();
 
-if (typeof window === 'undefined') {
-  (global as any).window = {
-    navigator: {
-      userAgent: '',
-    },
-    location: {
-      href: '',
-    },
-  };
+interface MyAppProps extends AppProps {
+  emotionCache?: EmotionCache;
 }
 
-function MyApp({ Component, pageProps }: AppProps) {
+function MyApp(props: MyAppProps) {
+  const { Component, emotionCache = clientSideEmotionCache, pageProps } = props;
+
+  React.useEffect(() => {
+    // Remove the server-side injected CSS.
+    const jssStyles = document.querySelector('#jss-server-side');
+    if (jssStyles?.parentElement) {
+      jssStyles.parentElement.removeChild(jssStyles);
+    }
+  }, []);
+
   return (
-    <RecoilRoot>
-      <ConfigProvider locale={zhCN}>
-        <Component {...pageProps} />
-      </ConfigProvider>
-    </RecoilRoot>
+    <CacheProvider value={emotionCache}>
+      <Head>
+        <meta name="viewport" content="initial-scale=1, width=device-width" />
+      </Head>
+      <ThemeProvider theme={theme}>
+        {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
+        <CssBaseline />
+        <RecoilRoot>
+          <Component {...pageProps} />
+        </RecoilRoot>
+      </ThemeProvider>
+    </CacheProvider>
   );
 }
 
-MyApp.getInitialProps = async (appContext) => ({ ...(await App.getInitialProps(appContext)) });
+MyApp.getInitialProps = async (appContext: any) => {
+  moment.locale(appContext.router.locale);
+  const appProps = await App.getInitialProps(appContext);
+  return { ...appProps };
+};
 
 export default appWithTranslation(MyApp);
