@@ -24,6 +24,9 @@ const StyledFooter = styled('footer')(({ _theme }) => ({
 
 const StyledContainer = styled('div')(({ _theme }) => ({
   ...styles.container,
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
 }));
 
 const StyledLeft = styled('div')(({ _theme }) => ({

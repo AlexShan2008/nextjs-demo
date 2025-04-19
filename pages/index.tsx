@@ -16,7 +16,6 @@ import GridItem from '@/components/Grid/GridItem.js';
 import Parallax from '@/components/Parallax/Parallax.js';
 
 const StyledContainer = styled('div')(({ theme }) => ({
-  padding: theme.spacing(2),
   backgroundColor: theme.palette.background.default,
 }));
 

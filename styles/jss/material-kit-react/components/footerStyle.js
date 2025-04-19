@@ -17,9 +17,10 @@ const footerStyle = {
     display: 'block',
   },
   right: {
-    padding: '15px 0',
-    margin: '0',
-    float: 'right!important',
+    marginLeft: 'auto',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   footer: {
     padding: '0.9375rem 0',
