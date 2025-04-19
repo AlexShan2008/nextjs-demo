@@ -92,7 +92,7 @@ const Home: NextPage = () => {
             <GridItem>
               <StyledBrand>
                 <h1>{t('welcome')}</h1>
-                <h3>A Badass Material-UI Kit based on Material Design.</h3>
+                <h3>A Modern MUI v5 Kit with Next.js and Material Design.</h3>
               </StyledBrand>
             </GridItem>
           </GridContainer>
