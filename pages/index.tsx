@@ -1,10 +1,11 @@
-import React from 'react';
+import { useCallback } from 'react';
 import { styled } from '@mui/material/styles';
 import type { GetStaticProps, NextPage } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Head from 'next/head';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { Button } from '@mui/material';
 import styles from '@/styles/Home.module.css';
 
@@ -35,8 +36,36 @@ const StyledBrand = styled('div')(() => ({
   },
 }));
 
+const StyledLanguageButton = styled(Button)(() => ({
+  transition: 'all 0.3s ease',
+  '&:hover': {
+    transform: 'translateY(-2px)',
+  },
+}));
+
 const Home: NextPage = () => {
-  const { t, i18n } = useTranslation('common');
+  const { t } = useTranslation('common');
+  const router = useRouter();
+  const { locale, pathname, asPath, query } = router;
+
+  const toggleLocale = useCallback(async () => {
+    // Prevent button double-click
+    if (router.isFallback) return;
+
+    const newLocale = locale === 'en' ? 'zh' : 'en';
+
+    // First update the locale without page refresh
+    await router.push({ pathname, query }, asPath, {
+      locale: newLocale,
+      shallow: true,
+      scroll: false,
+    });
+
+    // Then update the translations in the background
+    router.push({ pathname, query }, asPath, {
+      locale: newLocale,
+    });
+  }, [locale, pathname, asPath, query, router]);
 
   return (
     <StyledContainer>
@@ -72,13 +101,14 @@ const Home: NextPage = () => {
 
       <main className={styles.main}>
         <section>
-          <Button
+          <StyledLanguageButton
             variant="contained"
             color="primary"
-            onClick={() => i18n.changeLanguage(i18n.language === 'en' ? 'zh' : 'en')}
+            onClick={toggleLocale}
+            disabled={router.isFallback}
           >
             {t('change-locale')}
-          </Button>
+          </StyledLanguageButton>
         </section>
 
         <div className={styles.grid}>
@@ -98,6 +128,8 @@ export const getStaticProps: GetStaticProps = async ({ locale }) => {
     props: {
       ...(await serverSideTranslations(locale || 'en', ['common'])),
     },
+    // Add revalidation to ensure translations stay up to date
+    revalidate: 3600, // revalidate every hour
   };
 };
 
